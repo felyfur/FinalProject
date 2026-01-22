@@ -1,0 +1,184 @@
+explore_node:
+  ros__parameters:
+    robot_base_frame: base_footprint
+    costmap_topic: /global_costmap/costmap
+    costmap_updates_topic: /global_costmap/costmap_updates
+    visualize: true
+    planner_frequency: 0.1  # RIDOTTO DRASTICAMENTE: non serve pianificare spesso se siamo lenti
+    progress_timeout: 60.0  # Raddoppiato
+    potential_scale: 3.0
+    orientation_scale: 0.0
+    gain_scale: 1.0
+    transform_tolerance: 1.0 # Aumentato
+    min_frontier_size: 0.75
+
+# --- SLAM TOOLBOX ---
+slam_toolbox:
+  ros__parameters:
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+    odom_frame: fra2mo/odom
+    map_frame: map
+    base_frame: base_footprint
+    scan_topic: /lidar
+    mode: mapping
+    
+    # --- MODIFICHE PER RTF BASSO ---
+    transform_timeout: 5.0        # Aumentato (era 2.0)
+    tf_buffer_duration: 60.0      # Aumentato (era 30.0) per tenere più storia
+    map_update_interval: 3.0      # Rallentato l'aggiornamento mappa
+    
+    resolution: 0.05
+    max_laser_range: 12.0
+
+# --- NAV2 STANDARD ---
+bt_navigator:
+  ros__parameters:
+    use_sim_time: True
+    global_frame: map
+    robot_base_frame: base_footprint
+    odom_topic: /model/fra2mo/odometry
+    bt_loop_duration: 200     
+    default_server_timeout: 50 
+    
+    # --- AGGIUNGI QUESTO ---
+    # Aumentiamo il tempo che Nav2 aspetta una risposta dal controller
+    # prima di andare in errore. 900.0 è altissimo ma sicuro.
+    action_server_result_timeout: 900.0 
+    
+    transform_tolerance: 5.0
+    
+    # Assicurati che anche questo sia presente se usi plugin specifici
+    navigators: [navigate_to_pose, navigate_through_poses]
+
+controller_server:
+  ros__parameters:
+    use_sim_time: True
+    controller_frequency: 3.0  # Ridotto a 3Hz (era 5Hz)
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.001
+    min_theta_velocity_threshold: 0.001
+    controller_plugins: ["FollowPath"]
+    FollowPath:
+      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      desired_linear_vel: 0.6
+      use_rotate_to_heading: true
+      max_robot_pose_search_dist: 10.0
+      transform_tolerance: 5.0 # TOLLERANZA MOLTO ALTA
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: True
+      global_frame: fra2mo/odom
+      robot_base_frame: base_footprint
+      update_frequency: 2.0
+      publish_frequency: 1.0   # Pubblica meno spesso
+      rolling_window: True
+      width: 3
+      height: 3
+      resolution: 0.05
+      
+      # DIMENSIONI ROBOT
+      robot_radius: 0.25 
+      
+      transform_tolerance: 5.0 # TOLLERANZA MOLTO ALTA
+      
+      plugins: ["obstacle_layer", "inflation_layer"]
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        inflation_radius: 0.55 
+        cost_scaling_factor: 3.0
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        observation_sources: scan
+        scan:
+          topic: /lidar
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: True
+      global_frame: map
+      robot_base_frame: base_footprint
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      resolution: 0.05
+      
+      # DIMENSIONI ROBOT
+      robot_radius: 0.25
+      
+      transform_tolerance: 5.0 # TOLLERANZA MOLTO ALTA
+
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        observation_sources: scan
+        scan:
+          topic: /lidar
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        inflation_radius: 0.55
+        cost_scaling_factor: 3.0
+
+planner_server:
+  ros__parameters:
+    use_sim_time: True
+    expected_planner_frequency: 1.0
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: True
+    local_frame: fra2mo/odom
+    global_frame: map
+    robot_base_frame: base_footprint
+    behavior_plugins: ["spin", "backup", "drive_on_heading", "wait", "assisted_teleop"]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    drive_on_heading:
+      plugin: "nav2_behaviors/DriveOnHeading"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+    assisted_teleop:
+      plugin: "nav2_behaviors/AssistedTeleop"
+
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: True
+    loop_rate: 20
+    waypoint_task_executor_plugin: "wait_at_waypoint"
+    wait_at_waypoint:
+      plugin: "nav2_waypoint_follower::WaitAtWaypoint"
+      enabled: True
+
+velocity_smoother:
+  ros__parameters:
+    use_sim_time: True
+    smoothing_frequency: 20.0
+    scale_velocities: False
+    feedback: "OPEN_LOOP"
+    max_velocity: [0.6, 0.0, 2.5]
+    min_velocity: [-0.3, 0.0, -2.5]
+    max_accel: [2.5, 0.0, 3.2]
+    max_decel: [-2.5, 0.0, -3.2]
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 2.0 # Aumentato timeout

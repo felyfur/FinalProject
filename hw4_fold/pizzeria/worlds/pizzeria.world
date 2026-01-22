@@ -1,0 +1,374 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="pizzeria_world">
+
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0 2 3 0 0.7 3</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    
+    <physics name='default_physics' default='0' type='ode'>
+      <gravity>0 0 -9.8066</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>10</iters>
+          <sor>1.3</sor>
+          <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
+        </solver>
+        <constraints>
+          <cfm>0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>100</contact_max_correcting_vel>
+          <contact_surface_layer>0.001</contact_surface_layer>
+        </constraints>
+      </ode>
+      <max_step_size>0.0085</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+      <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
+    </physics>
+
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.6 0.4 0.2 1</ambient>
+            <diffuse>0.6 0.4 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="pizzeria_structure">
+      <static>true</static>
+      <link name="walls">
+        
+        <visual name="wall_west_visual">
+          <pose>-0.5 0 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 8.2 2.5</size>
+            </box>
+          </geometry>
+          <material><ambient>0.9 0.6 0.6 1</ambient><diffuse>0.9 0.6 0.6 1</diffuse></material>
+        </visual>
+        <collision name="wall_west_collision">
+          <pose>-0.5 0 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 8.2 2.5</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="wall_east_visual">
+          <pose>10 0 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 8.2 2.5</size>
+            </box>
+          </geometry>
+          <material><ambient>0.9 0.6 0.6 1</ambient><diffuse>0.9 0.6 0.6 1</diffuse></material>
+        </visual>
+        <collision name="wall_east_collision">
+          <pose>10 0 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 8.2 2.5</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="wall_north_visual">
+          <pose>4.75 4.1 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>10.7 0.2 2.5</size>
+            </box>
+          </geometry>
+          <material><ambient>0.9 0.6 0.6 1</ambient><diffuse>0.9 0.6 0.6 1</diffuse></material>
+        </visual>
+        <collision name="wall_north_collision">
+          <pose>4.75 4.1 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>10.7 0.2 2.5</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="wall_south_visual">
+          <pose>4.75 -4.1 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>10.7 0.2 2.5</size>
+            </box>
+          </geometry>
+          <material><ambient>0.9 0.6 0.6 1</ambient><diffuse>0.9 0.6 0.6 1</diffuse></material>
+        </visual>
+        <collision name="wall_south_collision">
+          <pose>4.75 -4.1 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>10.7 0.2 2.5</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="wall_sep_1_visual">
+          <pose>1.8 3.3 1.25 0 0 0</pose> <geometry>
+            <box>
+              <size>0.2 1.9 2.5</size>
+            </box>
+          </geometry>
+          <material><ambient>0.9 0.6 0.6 1</ambient><diffuse>0.9 0.6 0.6 1</diffuse></material>
+        </visual>
+        <collision name="wall_sep_1_collision">
+          <pose>1.8 3.3 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 1.9 2.5</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="wall_sep_2_visual">
+          <pose>1.8 -2.7 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 2.5 2.5</size>
+            </box>
+          </geometry>
+          <material><ambient>0.9 0.6 0.6 1</ambient><diffuse>0.9 0.6 0.6 1</diffuse></material>
+        </visual>
+        <collision name="wall_sep_2_collision">
+          <pose>1.8 -2.7 1.25 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 2.5 2.5</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="kitchen_counter">
+      <static>true</static> 
+      <pose>0 0 0.45 0 0 0</pose> 
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.8 2.0 0.9</size> 
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.8 2.0 0.9</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 1 0 1</ambient>
+            <diffuse>1 1 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <include>
+    <uri>model://pizza</uri>
+    <name>my_pizza</name>
+    <pose>0.2 0.5 1 0 0 0</pose> 
+    </include>
+
+    <model name="table_1">
+      <static>true</static>
+      <pose>4.0 1.5 0.35 0 0 0</pose> 
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.4 0.25 0.1 1</ambient>
+            <diffuse>0.4 0.25 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="table_2">
+      <static>true</static>
+      <pose>4.0 -1.5 0.35 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+          <material>
+             <ambient>0.4 0.25 0.1 1</ambient>
+             <diffuse>0.4 0.25 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <model name="table_3">
+      <static>true</static>
+      <pose>6 0 0.35 0 0 0</pose> 
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.4 0.25 0.1 1</ambient>
+            <diffuse>0.4 0.25 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="table_4">
+      <static>true</static>
+      <pose>8 -1.5 0.35 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+          <material>
+             <ambient>0.4 0.25 0.1 1</ambient>
+             <diffuse>0.4 0.25 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <model name="table_5">
+      <static>true</static>
+      <pose>8 1.5 0.35 0 0 0</pose> 
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.7</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.4 0.25 0.1 1</ambient>
+            <diffuse>0.4 0.25 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <plugin
+      filename="libignition-gazebo-physics-system.so"
+      name="ignition::gazebo::systems::Physics">
+    </plugin>
+    <plugin
+      filename="libignition-gazebo-user-commands-system.so"
+      name="ignition::gazebo::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="libignition-gazebo-scene-broadcaster-system.so"
+      name="ignition::gazebo::systems::SceneBroadcaster">
+    </plugin>
+
+    <plugin
+      filename="libignition-gazebo-sensors-system.so"
+      name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+  </world>
+</sdf>
