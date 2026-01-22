@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fra2mo" >
+  <xacro:include filename="$(find ros2_fra2mo)/urdf/fra2mo_base_macro.xacro"/>
+  <xacro:include filename="$(find ros2_fra2mo)/urdf/lidar_gazebo_macro.xacro"/> 
+  <xacro:property name="LIDAR" value="True"/>
+  
+  <xacro:fra2mo_base/>
+
+  <xacro:if value="${LIDAR}">
+    <xacro:lidar_gazebo_sensor parent="lidar_link"/>
+  </xacro:if>
+
+  <joint name="base_to_support_joint" type="fixed">
+    <parent link="base_link"/> 
+    <child link="support_link"/>
+    <origin xyz="0 0 0.2" rpy="0 0 0"/> 
+  </joint>
+
+  <link name="support_link">
+    <visual>
+      <origin xyz="0 0 0.30" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.69"/>
+      </geometry>
+      <material name="Black"> 
+        <color rgba="0 0 0 1"/> 
+      </material>
+    </visual>
+    
+    <collision>
+      <origin xyz="0 0 0.30" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.07" length="0.69"/>
+      </geometry>
+    </collision>
+    
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0.45" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="support_to_aruco_joint" type="fixed">
+    <parent link="support_link"/> 
+    <child link="aruco_tag_link"/>
+    <origin xyz="0 0 0.65" rpy="0 0 0"/> 
+  </joint>
+
+  <link name="aruco_tag_link">
+    <visual>
+      <geometry>
+        <box size="0.25 0.25 0.005"/> 
+      </geometry>
+      <material name="Black"> 
+        <color rgba="0 0 0 1"/> 
+      </material>
+    </visual>
+    
+    <collision>
+      <geometry>
+        <box size="0.2 0.2 0.005"/>
+      </geometry>
+      <surface>
+         <friction>
+            <ode>
+              <mu>1000.0</mu>
+              <mu2>1000.0</mu2>
+            </ode>
+         </friction>
+      </surface>
+    </collision>
+    
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+</robot>
